@@ -1,10 +1,18 @@
 # -- coding:utf-8 --
-from flask import Flask
+from flask import Flask,render_template
 
 app = Flask(__name__)
 
+
 @app.route('/')
-def index() :
-    return "<h1>你好,肖艳平</h1>"
+def index():
+    return render_template('index.html')
+
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html',name=name)
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
