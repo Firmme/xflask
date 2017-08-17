@@ -11,11 +11,6 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 import os
 
-
-def make_shell_context():
-    return dict(app=app, db=db, User=User, Role=Role)
-
-
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SECRET_KEY'] = 'xiao'
@@ -60,6 +55,10 @@ class NameForm(FlaskForm):
     submit = SubmitField(u'提交')
 
 
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role)
+
+
 @app.route('/', methods=['get', 'post'])
 def index():
     form = NameForm()
@@ -76,7 +75,7 @@ def index():
         form.name.data = ''
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'),
-                           known=session.get('known'),
+                           known=session.get('known', False),
                            current_time=datetime.utcnow())
 
 
