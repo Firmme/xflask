@@ -4,6 +4,11 @@
 {% block page_content %}
     <div class="page-header">
         <h1>你好,{% if name %}{{ name }}{% else %}游客{% endif %}!</h1>
+        {% if not known %}
+            <p>很高心认识你</p>
+        {% else %}
+            <p>怎么样,喜欢吗?</p>
+        {% endif %}
     </div>
     {{ wtf.quick_form(form) }}
     <p>现在的时间是 {{ moment(current_time).format('LLLL') }}.</p>

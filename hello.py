@@ -7,19 +7,30 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
-from flask_script import Manager
+from flask_script import Manager, Shell
+from flask_migrate import Migrate, MigrateCommand
 import os
+
+
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role)
+
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SECRET_KEY'] = 'xiao'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite ')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['DEBUG'] = True
 
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
 manager = Manager(app)
+migrate = Migrate(app, db)
+
+manager.add_command('db', MigrateCommand)
+manager.add_command("shell", Shell(make_context=make_shell_context))
 
 
 class Role(db.Model):
@@ -36,10 +47,10 @@ class Role(db.Model):
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    user_name = db.Column(db.String(64), unique=True, index=True)
+    username = db.Column(db.String(64), unique=True, index=True)
 
     def __repr__(self):
-        return '<User %r>' % self.user_name
+        return '<User %r>' % self.username
 
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
@@ -53,12 +64,19 @@ class NameForm(FlaskForm):
 def index():
     form = NameForm()
     if form.validate_on_submit():
-        old_name = session.get('name')
-        if old_name is not None and old_name != form.name.data:
-            flash(u'看起来你换了一个名字呢!')
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is None:
+            user = User(username=form.name.data)
+            db.session.add(user)
+            session['known'] = False
+        else:
+            session['known'] = True
+        print user
         session['name'] = form.name.data
+        form.name.data = ''
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'),
+                           known=session.get('known'),
                            current_time=datetime.utcnow())
 
 
