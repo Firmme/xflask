@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Message, Mail
+from threading import Thread
 import os
 
 app = Flask(__name__)
@@ -18,13 +19,13 @@ app.config['SECRET_KEY'] = 'xiao'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite ')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['DEBUG'] = True
-app.config['MAIL_SERVER'] = 'SMTP.QQ.COM'
-app.config['MAIL_PORT'] = 465
+app.config['MAIL_SERVER'] = 'smtp.qq.COM'
+app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('USER_PASSWORD')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[FLASKY]'
-app.config['FLASKY_SENDER'] = 'Flasky Admin<firmme@qq.com>'
+app.config['FLASKY_SENDER'] = 'Flasky Admin<Firmme@qq.com>'
 app.config['FLASKY_ADMIN'] = os.environ.get('FLASKY_ADMIN')
 
 bootstrap = Bootstrap(app)
@@ -39,12 +40,19 @@ def make_shell_context():
     return dict(app=app, db=db, User=User, Role=Role)
 
 
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
 def send_email(to, subject, template, **kwargs):
     msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX'] + subject,
                   sender=app.config['FLASKY_SENDER'], recipients=[to])
     msg.body = render_template(template + '.txt', **kwargs)
     msg.html = render_template(template + '.html', **kwargs)
-    mail.send(msg)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    return thr
 
 
 manager.add_command('db', MigrateCommand)
