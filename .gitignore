@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-data.sqlite
+*.sqlite
 *$py.class
 .idea/
 # C extensions
