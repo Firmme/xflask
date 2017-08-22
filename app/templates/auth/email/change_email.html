@@ -1,0 +1,8 @@
+<p>亲爱的 {{ user.username }}:</p>
+<p>您好!</p>
+<p>请确认你的新邮件地址</p>
+<p><a href="{{ url_for('auth.change_email',token = token,_external=True) }}">点击确认<a/></p>
+<p>{{ url_for('auth.change_email',token=token,_external=True) }}</p>
+<p>假如您没有请求重设密码,请忽略此邮件或与我们联系.</p>
+<p>Flask 团队.</p>
+<p>有疑问直接回复此邮件.</p>

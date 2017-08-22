@@ -4,7 +4,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SECRET_KEY = os.environ.get('SERET_KEY') or 'xiao'
     FLASKY_MAIL_SUBJECT_PREFIX = '[FLASKY]'
     FLASKY_SENDER = 'Flasky Admin<Firmme@qq.com>'

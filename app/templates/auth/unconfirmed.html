@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}账户未确认-小徵梓的乐园{% endblock %}
+{% block page_content %}
+    <div class="page-header">
+        <h1>您好,{{ current_user.username }}</h1>
+    </div>
+    <div>
+        <h3>您的账号还未确认.</h3>
+        <p>您在本网站注册之后需要激活您的账户.检查您的邮箱,找到激活邮件,内包含本网站的激活链接.<br>
+            未收到可能被识别为垃圾邮件,请再次检查垃圾箱
+        </p>
+        <p>
+            或者选择重发邮件,<a href="{{ url_for('auth.resend_confirmation') }}">点击重新发送</a>
+        </p>
+    </div>
+{% endblock %}

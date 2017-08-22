@@ -3,7 +3,7 @@
 {% block title %}小徵梓的乐园{% endblock %}
 {% block page_content %}
     <div class="page-header">
-        <h1>你好,
+        <h1>您好,
             {% if current_user.is_authenticated %}
                 {{ current_user.username }}
             {% else %}
@@ -11,6 +11,5 @@
             {% endif %}!</h1>
     </div>
     {{ wtf.quick_form(form) }}
-    <p>现在的时间是 {{ moment(current_time).format('LLLL') }}.</p>
-    <p>刷新于 {{ moment(current_time).fromNow(refresh=True) }}.</p>
+
 {% endblock %}
