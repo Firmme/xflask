@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField, SelectField, TextAreaField, Boolea
 from wtforms.validators import DataRequired, Length, Email, Regexp
 from wtforms import ValidationError
 from ..models import Role, User
+from flask_pagedown.fields import PageDownField
 
 
 class NameForm(FlaskForm):
@@ -12,20 +13,20 @@ class NameForm(FlaskForm):
 
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Real name', validators=[Length(0, 64)])
-    location = StringField('Location', validators=[Length(0, 64)])
-    about_me = TextAreaField('About me')
-    submit = SubmitField('Submit')
+    name = StringField(u'真实姓名', validators=[Length(0, 64)])
+    location = StringField(u'家乡', validators=[Length(0, 64)])
+    about_me = TextAreaField(u'关于我')
+    submit = SubmitField(u'提交')
 
 
 class EditProfileAdminForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
+    email = StringField(u'邮件', validators=[DataRequired(), Length(1, 64),
                                              Email()])
-    username = StringField('Username', validators=[
+    username = StringField(u'用户名', validators=[
         DataRequired(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                               u' 用户名只允许输入字母 '
                                               u'数字,点或下划线')])
-    confirmed = BooleanField('Confirmed')
+    confirmed = BooleanField(u'用户认证')
     role = SelectField(u'用户级别', coerce=int)
     name = StringField(u'真实姓名 ', validators=[Length(0, 64)])
     location = StringField(u'地址', validators=[Length(0, 64)])
@@ -49,5 +50,5 @@ class EditProfileAdminForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    body = TextAreaField(u"最近发生了什么?", validators=[DataRequired()])
+    body = PageDownField(u"最近发生了什么?", validators=[DataRequired()])
     submit = SubmitField(u'发布')
