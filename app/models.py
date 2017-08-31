@@ -16,11 +16,20 @@ def load_user(user_id):
 
 
 class Permission:
-    FOOLOW = 0x01
+    FOLLOW = 0x01
     COMMIT = 0X02
     WRITE_ARTICLES = 0X04
     MODERATE_COMMENTS = 0X08
     ADMINISTER = 0X80
+
+
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class Role(db.Model):
@@ -34,10 +43,10 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (Permission.FOOLOW |
+            'User': (Permission.FOLLOW |
                      Permission.COMMIT |
                      Permission.WRITE_ARTICLES, True),
-            'Moderator': (Permission.FOOLOW |
+            'Moderator': (Permission.FOLLOW |
                           Permission.WRITE_ARTICLES |
                           Permission.MODERATE_COMMENTS, False),
             'Adiministor': (0xff, False)
@@ -71,6 +80,16 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    followed = db.relationship('Follow',
+                               foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
 
     @staticmethod
     def generate_fake(count=100):
@@ -190,6 +209,24 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
+
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(followed=user)
+            self.followed.append(f)
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            self.followed.remove(f)
+
+    def is_following(self, user):
+        return self.followed.filter_by(
+                followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        return self.followers.filter_by(
+                follower_id=user.id).first() is not None
 
     def __repr__(self):
         return '<User %r>' % self.username
