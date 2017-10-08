@@ -7,10 +7,6 @@ from ..models import Role, User
 from flask_pagedown.fields import PageDownField
 
 
-class NameForm(FlaskForm):
-    name = StringField(u'您的名字是?', validators=[DataRequired()])
-    submit = SubmitField(u'提交')
-
 
 class EditProfileForm(FlaskForm):
     name = StringField(u'真实姓名', validators=[Length(0, 64)])
@@ -21,7 +17,7 @@ class EditProfileForm(FlaskForm):
 
 class EditProfileAdminForm(FlaskForm):
     email = StringField(u'邮件', validators=[DataRequired(), Length(1, 64),
-                                             Email()])
+                                           Email()])
     username = StringField(u'用户名', validators=[
         DataRequired(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                               u' 用户名只允许输入字母 '

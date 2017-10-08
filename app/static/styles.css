@@ -5,6 +5,10 @@
     min-height: 260px;
     margin-left: 280px;
 }
+div.welcome{
+    padding: inherit;
+    margin: auto;
+}
 div.post-tabs {
     margin-top: 16px;
 }
@@ -95,7 +99,7 @@ div.flask-pagedown-preview h3 {
     font-size: 120%;
 }
 .post-body{
-    word-wrap:break-word
+    overflow: auto;
 }
 .post-body h1 {
     font-size: 140%;
